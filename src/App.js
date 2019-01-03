@@ -7,12 +7,16 @@ class App extends Component {
 
   state = {
     termino: '',
-    imagenes: []
+    imagenes: [],
+    pagina: ''
   }
 
   consultarAPI = () => {
     const termino = this.state.termino;
-    const url = `https://pixabay.com/api/?key=15941-6089299c03fb143b393fc700a&q=${termino}`;
+    const pagina = this.state.pagina;
+    const url = `https://pixabay.com/api/?key=15941-6089299c03fb143b393fc700a&q=${termino}&per_page=30&page=${pagina}`;
+
+    console.log(url);
 
     fetch(url)
       .then(respuesta => respuesta.json())
@@ -21,10 +25,37 @@ class App extends Component {
 
   datosBusqueda = (termino) => {
       this.setState({
-        termino
+        termino : termino,
+        pagina : 1
       }, () => {
         this.consultarAPI();
       })
+  }
+
+  paginaAnterior = () => {
+    let pagina= this.state.pagina;
+    if(pagina === 1) return null;
+    pagina--;
+    this.setState({pagina}, () => {
+      this.consultarAPI();
+      this.scroll();
+    })
+    console.log(pagina);
+  }
+
+  paginaSiguiente = () => {
+    let pagina= this.state.pagina;
+    pagina++;
+    this.setState({pagina}, () => {
+      this.consultarAPI();
+      this.scroll();
+    })
+    console.log(pagina);
+  }
+
+  scroll = () => {
+    const elemento = document.querySelector('#resultado');
+    elemento.scrollIntoView('smooth', 'start');
   }
 
   render() {
@@ -40,6 +71,8 @@ class App extends Component {
         <div className="row justify-content-center">
           <Resultado 
             imagenes={this.state.imagenes}
+            paginaAnterior={this.paginaAnterior}
+            paginaSiguiente={this.paginaSiguiente}
           />
         </div>
 
